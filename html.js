@@ -1,4 +1,4 @@
-/* html.js - 14.14 01-30 2022 */ 
+/* html.js - 17.46 01-30 2022 */ 
 export {HTML, E};
 
 /*** [Element Selector] ***/
@@ -22,7 +22,7 @@ for(const name of "A,ABBR,ACRONYM,ADDRESS,APPLET,AREA,ARTICLE,ASIDE,AUDIO,B,BASE
       this._current = newElement;
       return this;
     }
-  })
+  });
 }
 /*** tag-end ***/
 Object.defineProperty(HTML.prototype, "$", {
@@ -38,7 +38,7 @@ for(const name of "abbr,accept,accept-charset,accesskey,action,align,alink,allow
   HTML.prototype[name.replace(/-[a-z]/g, m => m[1].toUpperCase())] = function(...args){
     this._current.setAttribute(name, _tagStr(args));
     return this;
-  }
+  };
 }
 /*** data-* ***/
 HTML.prototype.data_ = function(...args){
@@ -58,7 +58,7 @@ for(const name of "azimuth,background,background-attachment,background-color,bac
   HTML.prototype[name.replace(/-[a-z]/g, m => m[1].toUpperCase())] = function(...args){
     this._current.style.setProperty(name, _tagStr(args));
     return this;
-  }
+  };
 }
 /*** text ***/
 HTML.prototype.T = function(...args){
