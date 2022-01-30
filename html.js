@@ -1,10 +1,10 @@
-/* html.js - 14.00 01-30 2022 */ 
+/* html.js - 14.14 01-30 2022 */ 
 export {HTML, E};
 
 /*** [Element Selector] ***/
 const E = (...args) => args[0] instanceof EventTarget ? args[0] : document.getElementById(_tagStr(args));
 
-/*** [HTML Buillder] ***/
+/*** [HTML Builder] ***/
 const HTML = function(...args){
   if(!(this instanceof HTML)) return new HTML(...args);
   this._target = E(_tagStr(args));
