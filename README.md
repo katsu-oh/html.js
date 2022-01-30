@@ -1,5 +1,7 @@
 # html.js
 
+(... under construction ...)
+
 This is a simple HTML builder / DOM Builder.
  - The functions have the same names as tags/attributes/styles/events.
  - The functions with string arguments can also be used as tagged templates.
