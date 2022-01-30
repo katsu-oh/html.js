@@ -94,7 +94,7 @@ h.publish();
 
 ## Example 3
 ```javascript
-HTML`div-target`. $span.T`a message`.$. publish();                // one liner
+HTML`div-target`. $SPAN.T`a message`.$. publish();                // one liner
 ```
 
 ## Result 3
