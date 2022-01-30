@@ -124,14 +124,14 @@ function publishSubHTML(event){
 }
 
 function showMessage(event){
-  HTML`res-1`. T`Clicked!`. publish();          // publish() replace child nodes
+  HTML`res-1`. T`Clicked!`. publish();         // publish(): replace child nodes
 }
 
 function appendMessage(event){
   HTML`res-2`.
     T`Clicked!`.
     $SPAN. id`res-2`. $.
-  publish(true);                         // publish(true) replace target element
+  publish(true);                        // publish(true): replace target element
 }
 ```
 
@@ -153,4 +153,9 @@ function appendMessage(event){
    ...
   <span id="res-2"></span>
 </...>
+```
+
+## Appendix
+```javascript
+E`div-target`.style.visibility = "hidden";           // E`id`: get element by id
 ```
