@@ -116,7 +116,7 @@ h. $SPAN;
 h.  on.publish(publishSubHTML);
 h.  on.click(appendMessage);
 h. $;
-h. $SPAN. id`res-2`. $;
+h. $SPAN. id`res-2`. data_`count``1`. $;
 h.publish();                        // fire 'publish' events after replace nodes
 
 function publishSubHTML(event){
@@ -128,9 +128,10 @@ function showMessage(event){
 }
 
 function appendMessage(event){
+  const count = Number(E`res-2`.dataset.count);      // E`id`: get element by id
   HTML`res-2`.
-    T`Clicked!`.
-    $SPAN. id`res-2`. $.
+    T`Clicked!`. T(count).
+    $SPAN. id`res-2`. data_`count`(count + 1). $.
   publish(true);                        // publish(true): replace target element
 }
 ```
@@ -148,14 +149,9 @@ function appendMessage(event){
   <span>
     Click here, many times.
   </span>
-  Clicked!
-  Clicked!
-   ...
-  <span id="res-2"></span>
+  Clicked!1
+  Clicked!2
+  Clicked!3
+  <span id="res-2" data-count="4"></span>
 </...>
-```
-
-## Appendix
-```javascript
-E`div-target`.style.visibility = "hidden";           // E`id`: get element by id
 ```
