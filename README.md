@@ -145,7 +145,7 @@ function appendMessage(event){
     Clicked!
   </span>
   <br>
-  <span id="click-2">
+  <span>
     Click here, many times.
   </span>
   Clicked!
