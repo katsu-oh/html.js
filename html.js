@@ -1,4 +1,4 @@
-/* html.js - 17.46 01-30 2022 */ 
+/* html.js (version 1.0.0) */
 export {HTML, E};
 
 /*** [Element Selector] ***/
