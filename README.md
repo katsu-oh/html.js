@@ -7,7 +7,7 @@ This is a simple HTML builder / DOM builder.
 
 ## Example 1
 ```javascript
-const h = HTML(document.body);                                // target element
+const h = HTML(document.body);                                       // target element
 h. $H1. T`TITLE`. $;
 h. $DIV. id`div-2`. color`red`;
 h.   T`Click! > `;
@@ -15,7 +15,7 @@ h.   $A. href`http://www.example.com/`;
 h.     T`Example Company`;
 h.   $;
 h. $;
-h.publish();                                  // append nodes to target element
+h.publish();                                         // append nodes to target element
 ```
 
 ## Result 1
@@ -43,12 +43,12 @@ const inks = [
 const h = HTML(document.body);
 h. $H1. T`Inks`. $;
 h. $TABLE;
-for(const ink of inks){                                                 // for ..
+for(const ink of inks){                                                      // for ..
   h. $TR;
   h.   $TD. T(ink.label). $;
   h.   $TD. T(ink.color). $;
   h.   $TD. T(ink.date). $;
-  if(ink.meter < 20){                                                    // if .. 
+  if(ink.meter < 20){                                                         // if ..
     h. $TD. T(ink.meter + "%"). color`red`. $;
   }else{
     h. $TD. T(ink.meter + "%"). color`green`. $;
@@ -94,7 +94,7 @@ h.publish();
 
 ## Example 3
 ```javascript
-HTML`div-target`. $SPAN.T`a message`.$. publish();                // one liner
+HTML`div-target`. $SPAN.T`a message`.$. publish();                        // one liner
 ```
 
 ## Result 3
@@ -106,7 +106,7 @@ HTML`div-target`. $SPAN.T`a message`.$. publish();                // one liner
 
 ## Example 4
 ```javascript
-const h = HTML`div-target`;                             // id of target element
+const h = HTML`div-target`;                                    // id of target element
 h. $SPAN. T`Click here.`;
 h.  on.click(showMessage);
 h. $;
@@ -117,22 +117,22 @@ h.  on.publish(publishSubHTML);
 h.  on.click(appendMessage);
 h. $;
 h. $SPAN. id`res-2`. data_`count``1`. $;
-h.publish();                        // fire 'publish' events after replace nodes
+h.publish();                              // fire 'publish' events after replace nodes
 
 function publishSubHTML(event){
   HTML(event.currentTarget). T`Click here, many times.`. publish();
 }
 
 function showMessage(event){
-  HTML`res-1`. T`Clicked!`. publish();         // publish(): replace child nodes
+  HTML`res-1`. T`Clicked!`. publish();               // publish(): replace child nodes
 }
 
 function appendMessage(event){
-  const count = Number(E`res-2`.dataset.count);      // E`id`: get element by id
+  const count = Number(E`res-2`.dataset.count);            // E`id`: get element by id
   HTML`res-2`.
     T`Clicked!`. T(count).
     $SPAN. id`res-2`. data_`count`(count + 1). $.
-  publish(true);                        // publish(true): replace target element
+  publish(true);                              // publish(true): replace target element
 }
 ```
 
