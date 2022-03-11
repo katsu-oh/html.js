@@ -1,8 +1,14 @@
-// html.js 1.1.0 / ©2022 katsu-oh / MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE /
+// html.js 1.2.0 / ©2022 katsu-oh / MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE /
 export {HTML, E};
 
+/*** (short) ***/
+const _content = e => e instanceof HTMLTemplateElement ? e.content : e;
+const _root = h => h._stack[0] ?? h._current;
+const _js = t => t.replace(/[\\`$]/g, m => "\\" + m).replace(/\n/g, "\\n");
+const _camel = n => n.replace(/-[a-z]/g, m => m[1].toUpperCase());
+
 /*** [Element Selector] ***/
-const E = (...args) => args[0] instanceof EventTarget ? args[0] : document.getElementById(_tagStr(args));
+const E = (...args) => args[0] instanceof Element ? args[0] : document.getElementById(_tagStr(args));
 
 /*** [HTML Builder] ***/
 const HTML = function(...args){
@@ -12,14 +18,14 @@ const HTML = function(...args){
   this._current = document.createElement("template");
   this.on = new _On();
   this.on._owner = this;
-  this._onPublishElements = [];
+  this._onPublishTargets = [];
 };
 /*** tag-begin ***/
 HTML.prototype.defineTag = function(name){
   Object.defineProperty(this, "$" + name, {configurable: true, enumerable: true,
     get(){
       const newElement = document.createElement(name);
-      (this._current instanceof HTMLTemplateElement ? this._current.content : this._current).appendChild(newElement);
+      _content(this._current).appendChild(newElement);
       this._stack.push(this._current);
       this._current = newElement;
       return this;
@@ -38,7 +44,7 @@ Object.defineProperty(HTML.prototype, "$", {configurable: true, enumerable: true
 });
 /*** attribute ***/
 HTML.prototype.defineAttribute = function(name){
-  this[name.replace(/-[a-z]/g, m => m[1].toUpperCase())] = function(...args){
+  this[_camel(name)] = function(...args){
     this._current.setAttribute(name, _tagStr(args));
     return this;
   };
@@ -59,7 +65,7 @@ HTML.prototype.data_ = function(...args){
 };
 /*** style ***/
 HTML.prototype.defineStyle = function(name){
-  this[name.replace(/-[a-z]/g, m => m[1].toUpperCase())] = function(...args){
+  this[_camel(name)] = function(...args){
     this._current.style.setProperty(name, _tagStr(args));
     return this;
   };
@@ -67,22 +73,17 @@ HTML.prototype.defineStyle = function(name){
 "azimuth,background,background-attachment,background-color,background-image,background-position,background-repeat,border,border-bottom,border-bottom-color,border-bottom-style,border-bottom-width,border-collapse,border-color,border-left,border-left-color,border-left-style,border-left-width,border-right,border-right-color,border-right-style,border-right-width,border-spacing,border-style,border-top,border-top-color,border-top-style,border-top-width,border-width,bottom,caption-side,clear,clip,color,Content,counter-increment,counter-reset,cue,cue-after,cue-before,cursor,direction,display,elevation,empty-cells,float,font,font-family,font-size,font-style,font-variant,font-weight,height,left,letter-spacing,line-height,list-style,list-style-image,list-style-position,list-style-type,margin,margin-bottom,margin-left,margin-right,margin-top,max-height,max-width,min-height,min-width,orphans,outline,outline-color,outline-style,outline-width,overflow,padding,padding-bottom,padding-left,padding-right,padding-top,page-break-after,page-break-before,page-break-inside,pause,pause-after,pause-before,pitch,pitch-range,play-during,position,quotes,richness,right,speak,speak-header,speak-numeral,speak-punctuation,speech-rate,stress,table-layout,text-align,text-decoration,text-indent,text-transform,top,unicode-bidi,vertical-align,visibility,voice-family,volume,white-space,widows,width,word-spacing,z-index".split(",").forEach(name => HTML.prototype.defineStyle(name));
 /*** text ***/
 HTML.prototype.T = function(...args){
-  (this._current instanceof HTMLTemplateElement ? this._current.content : this._current).appendChild(document.createTextNode(_tagStr(args)));
+  _content(this._current).appendChild(document.createTextNode(_tagStr(args)));
   return this;
 };
 /*** html ***/
 HTML.prototype.HTML = function(...args){
-  const html = _tagStr(args);
-  if(html instanceof HTML){
-    (this._current instanceof HTMLTemplateElement ? this._current.content : this._current).appendChild((html._stack.length == 0 ? html._current : html._stack[0]).content);
-    this._onPublishElements = this._onPublishElements.concat(html._onPublishElements)
-  }else{
-    if(this._current instanceof HTMLTemplateElement){
-      this._current.innerHTML += html;
-    }else{
-      this._current.insertAdjacentHTML("beforeend", html);
-    }
+  let html = args[0];
+  if(!(html instanceof HTML)){
+    (html = HTML())._current.innerHTML = _tagStr(args);
   }
+  _content(this._current).appendChild(_root(html).content);
+  this._onPublishTargets.push(...html._onPublishTargets);
   return this;
 };
 /*** event ***/
@@ -98,23 +99,41 @@ HTML.prototype.defineEvent = function(type){
 HTML.prototype.on.publish = function(listener, options){
   if(this._owner._stack.length > 0){
     this._owner._current.addEventListener("publish", listener, options);
-    this._owner._onPublishElements.push(this._owner._current);
+    this._owner._onPublishTargets.push(this._owner._current);
   }
   return this._owner;
 };
 /*** publish ***/
 HTML.prototype.publish = function(removeTarget){
   if(removeTarget){
-    this._target.replaceWith((this._stack.length > 0 ? this._stack[0] : this._current).content);
+    this._target.replaceWith(_root(this).content);
   }else{
     this._target.innerHTML = "";
-    this._target.appendChild((this._stack.length > 0 ? this._stack[0] : this._current).content);
+    this._target.appendChild(_root(this).content);
   }
-  new Set(this._onPublishElements).forEach(element => element.dispatchEvent(new Event("publish")));
+  new Set(this._onPublishTargets).forEach(e => e.dispatchEvent(new Event("publish")));
 };
-/*** toString ***/
+/*** to-HTML ***/
 HTML.prototype.toString = function(){
-  return (this._stack.length > 0 ? this._stack[0] : this._current).innerHTML;
+  return _root(this).innerHTML;
+};
+/*** to-JS ***/
+function _code(sb, node, indent){
+  for(const c of _content(node).childNodes){
+    if(c.nodeType == 3){
+      sb.push(c.textContent.split(/\n[ \t]*/g).map(text => text == "" ? "" : `T\`${_js(text)}\`.`).join(indent));
+    }else if(c.nodeType == 1){
+      sb.push(`\$${c.tagName}.`);
+      [...c.attributes].forEach(attr => sb.push(attr.name == "style" ? "" : attr.name.startsWith("data-") ? `data_\`${attr.name.slice(5)}\`\`${_js(attr.value)}\`.` : `${_camel((~",background,border,clear,color,height,width,".indexOf(`,${attr.name},`) ? "-" : "") + attr.name)}\`${_js(attr.value)}\`.`));
+      [...c.style].forEach(name => sb.push(`${_camel(name)}\`${_js(c.style[name])}\`.`));
+      _code(sb, c, indent + "  ");
+      sb.push((sb.pop() + "$.").replace("  $", "$"));
+    }
+  }
+  return sb;
+}
+HTML.prototype.toLocaleString = function(){
+  return _code([], _root(this), "\n").join("");
 };
 
 /*** (template literal) ***/
