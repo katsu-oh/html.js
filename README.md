@@ -155,3 +155,28 @@ function appendMessage(event){
   <span id="res-2" data-count="4"></span>
 </...>
 ```
+
+## Example 5
+```javascript
+const js = HTML().HTML                                                    // from HTML
+ `<h1>TITLE</h1>
+  <div id="div-2" style="color: red;">
+    Click! &gt; 
+    <a href="http://www.example.com/">
+      Example Company
+    </a>
+  </div>`
+.toLocaleString();                                                    // to JavaScript
+alert(js);
+```
+
+## Result 5
+```
+$H1.T`TITLE`.$.
+$DIV.id`div-2`.color`red`.
+  T`Click! > `.
+  $A.href`http://www.example.com/`.
+    T`Example Company`.
+  $.
+$.
+```
