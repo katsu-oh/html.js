@@ -11,7 +11,7 @@ const h = HTML(document.body);                                       // target e
 h. $H1. T`TITLE`. $;
 h. $DIV. id`div-2`. color`red`;
 h.   T`Click! > `;
-h.   $A. href`http://www.example.com/`;
+h.   $A. class`link`. href`http://www.example.com/`;
 h.     T`Example Company`;
 h.   $;
 h. $;
@@ -24,7 +24,7 @@ h.publish();                                         // append nodes to target e
   <h1>TITLE</h1>
   <div id="div-2" style="color: red;">
     Click! &gt; 
-    <a href="http://www.example.com/">
+    <a class="link" href="http://www.example.com/">
       Example Company
     </a>
   </div>
@@ -49,7 +49,7 @@ for(const ink of inks){                                                      // 
   h.   $TD. T(ink.color). $;
   h.   $TD. T(ink.date). $;
   if(ink.meter < 20){                                                         // if ..
-    h. $TD. T(ink.meter + "%"). color`red`. $;
+    h. $TD. T(ink.meter + "%"). color`red`. backgroundColor`pink`. $;
   }else{
     h. $TD. T(ink.meter + "%"). color`green`. $;
   }
@@ -86,7 +86,7 @@ h.publish();
       <td>Y</td>
       <td>Yellow</td>
       <td>2020-01-30</td>
-      <td style="color: red;">15%</td>
+      <td style="color: red; background-color: pink;">15%</td>
     </tr>
   </table>
 </body>
@@ -116,7 +116,7 @@ h. $SPAN;
 h.  on.publish(publishSubHTML);
 h.  on.click(appendMessage);
 h. $;
-h. $SPAN. id`res-2`. data_`count``1`. $;
+h. $SPAN. id`res-2`. data_`count``1`. hidden(true). $;
 h.publish();                              // fire 'publish' events after replace nodes
 
 function publishSubHTML(event){
@@ -131,7 +131,7 @@ function appendMessage(event){
   const count = Number(E`res-2`.dataset.count);            // E`id`: get element by id
   HTML`res-2`.
     T`Clicked!`. T(count).
-    $SPAN. id`res-2`. data_`count`(count + 1). $.
+    $SPAN. id`res-2`. data_`count`(count + 1). hidden(true). $.
   publish(true);                              // publish(true): replace target element
 }
 ```
@@ -152,7 +152,7 @@ function appendMessage(event){
   Clicked!1
   Clicked!2
   Clicked!3
-  <span id="res-2" data-count="4"></span>
+  <span id="res-2" data-count="4" hidden=""></span>
 </...>
 ```
 
@@ -162,7 +162,7 @@ const js = HTML().HTML                                                    // fro
  `<h1>TITLE</h1>
   <div id="div-2" style="color: red;">
     Click! &gt; 
-    <a href="http://www.example.com/">
+    <a class="link" href="http://www.example.com/">
       Example Company
     </a>
   </div>`
@@ -175,8 +175,10 @@ alert(js);
 $H1.T`TITLE`.$.
 $DIV.id`div-2`.color`red`.
   T`Click! > `.
-  $A.href`http://www.example.com/`.
+  $A.class`link`.href`http://www.example.com/`.
     T`Example Company`.
   $.
 $.
 ```
+
+See [Wiki](https://github.com/katsu-oh/html.js/wiki) for details.
