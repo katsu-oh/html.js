@@ -1,9 +1,9 @@
-// html.js 1.2.0 / ©2022 katsu-oh / MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE /
+// html.js 1.2.1 / ©2022 katsu-oh / MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE /
 export {HTML, E};
 
 /*** (short) ***/
 const _content = e => e instanceof HTMLTemplateElement ? e.content : e;
-const _root = h => h._stack[0] ?? h._current;
+const _root = h => h._stack[0] || h._current;
 const _js = t => t.replace(/[\\`$]/g, m => "\\" + m).replace(/\n/g, "\\n");
 const _camel = n => n.replace(/-[a-z]/g, m => m[1].toUpperCase());
 
@@ -13,12 +13,12 @@ const E = (...args) => args[0] instanceof Element ? args[0] : document.getElemen
 /*** [HTML Builder] ***/
 const HTML = function(...args){
   if(!(this instanceof HTML)) return new HTML(...args);
-  this._target = E(_tagStr(args));
+  this._target = E(...args);
   this._stack = [];
   this._current = document.createElement("template");
   this.on = new _On();
   this.on._owner = this;
-  this._onPublishTargets = [];
+  this._publishEvents = [];
 };
 /*** tag-begin ***/
 HTML.prototype.defineTag = function(name){
@@ -36,7 +36,7 @@ HTML.prototype.defineTag = function(name){
 /*** tag-end ***/
 Object.defineProperty(HTML.prototype, "$", {configurable: true, enumerable: true,
   get(){
-    if(this._stack.length > 0){
+    if(this._stack[0]){
       this._current = this._stack.pop();
     }
     return this;
@@ -45,7 +45,9 @@ Object.defineProperty(HTML.prototype, "$", {configurable: true, enumerable: true
 /*** attribute ***/
 HTML.prototype.defineAttribute = function(name){
   this[_camel(name)] = function(...args){
-    this._current.setAttribute(name, _tagStr(args));
+    if(args[0] !== false){
+      this._current.setAttribute(name, args[0] === true ? "" : _tagStr(args));
+    }
     return this;
   };
 };
@@ -83,7 +85,7 @@ HTML.prototype.HTML = function(...args){
     (html = HTML())._current.innerHTML = _tagStr(args);
   }
   _content(this._current).appendChild(_root(html).content);
-  this._onPublishTargets.push(...html._onPublishTargets);
+  this._publishEvents.push(...html._publishEvents);
   return this;
 };
 /*** event ***/
@@ -97,9 +99,9 @@ HTML.prototype.defineEvent = function(type){
 };
 "abort,afterprint,afterscriptexecute,animationcancel,animationend,animationiteration,animationstart,appinstalled,auxclick,beforeinput,beforeprint,beforescriptexecute,beforeunload,blur,cancel,canplay,canplaythrough,change,click,close,compositionend,compositionstart,compositionupdate,contextmenu,copy,cuechange,cut,dblclick,devicemotion,deviceorientation,DOMActivate,DOMContentLoaded,DOMMouseScroll,drag,dragend,dragenter,dragleave,dragover,dragstart,drop,durationchange,emptied,ended,enterpictureinpicture,error,focus,focusin,focusout,formdata,fullscreenchange,fullscreenerror,gamepadconnected,gamepaddisconnected,gotpointercapture,hashchange,input,invalid,keydown,keypress,keyup,languagechange,leavepictureinpicture,load,loadeddata,loadedmetadata,loadstart,lostpointercapture,message,messageerror,mousedown,mouseenter,mouseleave,mousemove,mouseout,mouseover,mouseup,mousewheel,offline,online,orientationchange,overflow,pagehide,pageshow,paste,pause,play,playing,pointercancel,pointerdown,pointerenter,pointerleave,pointerlockchange,pointerlockerror,pointermove,pointerout,pointerover,pointerup,popstate,progress,ratechange,readystatechange,rejectionhandled,reset,resize,scroll,search,seeked,seeking,select,selectionchange,selectstart,show,slotchange,stalled,storage,submit,suspend,timeupdate,toggle,touchcancel,touchend,touchmove,touchstart,transitioncancel,transitionend,transitionrun,transitionstart,underflow,unhandledrejection,unload,visibilitychange,volumechange,waiting,webglcontextcreationerror,webglcontextlost,webglcontextrestored,wheel".split(",").forEach(type => HTML.prototype.defineEvent(type));
 HTML.prototype.on.publish = function(listener, options){
-  if(this._owner._stack.length > 0){
+  if(this._owner._stack[0]){
     this._owner._current.addEventListener("publish", listener, options);
-    this._owner._onPublishTargets.push(this._owner._current);
+    this._owner._publishEvents.push(this._owner._current);
   }
   return this._owner;
 };
@@ -111,7 +113,7 @@ HTML.prototype.publish = function(removeTarget){
     this._target.innerHTML = "";
     this._target.appendChild(_root(this).content);
   }
-  new Set(this._onPublishTargets).forEach(e => e.dispatchEvent(new Event("publish")));
+  new Set(this._publishEvents).forEach(e => e.dispatchEvent(new Event("publish")));
 };
 /*** to-HTML ***/
 HTML.prototype.toString = function(){
@@ -121,7 +123,7 @@ HTML.prototype.toString = function(){
 function _code(sb, node, indent){
   for(const c of _content(node).childNodes){
     if(c.nodeType == 3){
-      sb.push(c.textContent.split(/\n[ \t]*/g).map(text => text == "" ? "" : `T\`${_js(text)}\`.`).join(indent));
+      sb.push(c.textContent.split(/\n[ \t]*/g).map(text => text && `T\`${_js(text)}\`.`).join(indent));
     }else if(c.nodeType == 1){
       sb.push(`\$${c.tagName}.`);
       [...c.attributes].forEach(attr => sb.push(attr.name == "style" ? "" : attr.name.startsWith("data-") ? `data_\`${attr.name.slice(5)}\`\`${_js(attr.value)}\`.` : `${_camel((~",background,border,clear,color,height,width,".indexOf(`,${attr.name},`) ? "-" : "") + attr.name)}\`${_js(attr.value)}\`.`));
