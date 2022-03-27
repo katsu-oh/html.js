@@ -1,4 +1,4 @@
-'html.js 1.3.0, ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE';
+var c = 'html.js 1.3.0, ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE';
 export {HTML, E};
 
 /*** (short) ***/
