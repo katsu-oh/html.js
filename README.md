@@ -3,7 +3,7 @@
 This is a simple HTML builder / DOM builder.
  - The functions have the same names as tags / attributes / styles / events.
  - The functions with string arguments can also be used as tagged templates.
- - The functions return 'this' for using the method chaining.
+ - The functions return 'this' for using method chaining.
 
 ## Example 1
 ```javascript
@@ -106,17 +106,22 @@ HTML`div-target`. $SPAN.T`a message`.$. publish();                        // one
 
 ## Example 4
 ```javascript
+let newID = 0;
+
+const id1 = ++newID;
+const id2 = ++newID;
+
 const h = HTML`div-target`;                                    // id of target element
 h. $SPAN. T`Click here.`;
 h.  on.click(showMessage);
 h. $;
-h. $SPAN. id`res-1`. $;
+h. $SPAN. id(id1). $;
 h. $BR. $;
 h. $SPAN;
 h.  on.publish(publishSubHTML);
 h.  on.click(appendMessage);
 h. $;
-h. $SPAN. id`res-2`. data_`count``1`. hidden(true). $;
+h. $SPAN. id(id2). data_`count``1`. hidden(true). $;
 h.publish();                              // fire 'publish' events after replace nodes
 
 function publishSubHTML(event){
@@ -124,14 +129,14 @@ function publishSubHTML(event){
 }
 
 function showMessage(event){
-  HTML`res-1`. T`Clicked!`. publish();               // publish(): replace child nodes
+  HTML(id1). T`Clicked!`. publish();                 // publish(): replace child nodes
 }
 
 function appendMessage(event){
-  const count = Number(E`res-2`.dataset.count);            // E`id`: get element by id
-  HTML`res-2`.
+  const count = Number(E(id2).dataset.count);              // E`id`: get element by id
+  HTML(id2).
     T`Clicked!`. T(count).
-    $SPAN. id`res-2`. data_`count`(count + 1). hidden(true). $.
+    $SPAN. id(id2). data_`count`(count + 1). hidden(true). $.
   publish(true);                              // publish(true): replace target element
 }
 ```
@@ -142,7 +147,7 @@ function appendMessage(event){
   <span>
     Click here.
   </span>
-  <span id="res-1">
+  <span id="1">
     Clicked!
   </span>
   <br>
@@ -152,7 +157,7 @@ function appendMessage(event){
   Clicked!1
   Clicked!2
   Clicked!3
-  <span id="res-2" data-count="4" hidden=""></span>
+  <span id="2" data-count="4" hidden=""></span>
 </...>
 ```
 
@@ -182,3 +187,6 @@ $.
 ```
 
 See [Wiki](https://github.com/katsu-oh/html.js/wiki) for details.
+
+<br>
+©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE.
