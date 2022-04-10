@@ -188,5 +188,5 @@ $.
 
 See [Wiki](https://github.com/katsu-oh/html.js/wiki) for details.
 
-<br>
+## <br>
 ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE.
