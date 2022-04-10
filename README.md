@@ -185,6 +185,7 @@ $DIV.id`div-2`.color`red`.
   $.
 $.
 ```
+<br>
 
 See [Wiki](https://github.com/katsu-oh/html.js/wiki) for details.
 
