@@ -71,24 +71,36 @@ h.publish();
       <td>K</td>
       <td>Black</td>
       <td>2020-04-03</td>
+      <td>
+        <button type="button" disabled="">Replace</button>
+      </td>
       <td style="color: green;">50%</td>
     </tr>
     <tr>
       <td>C</td>
       <td>Cyan</td>
       <td>2020-02-15</td>
+      <td>
+        <button type="button" disabled="">Replace</button>
+      </td>
       <td style="color: green;">30%</td>
     </tr>
     <tr>
       <td>M</td>
       <td>Megenta</td>
       <td>2021-04-03</td>
+      <td>
+        <button type="button" disabled="">Replace</button>
+      </td>
       <td style="color: green;">80%</td>
     </tr>
     <tr>
       <td>Y</td>
       <td>Yellow</td>
       <td>2020-01-30</td>
+      <td>
+        <button type="button">Replace</button>
+      </td>
       <td style="color: red; background-color: pink;">15%</td>
     </tr>
   </table>
