@@ -48,10 +48,13 @@ for(const ink of inks){                                                      // 
   h.   $TD. T(ink.label). $;
   h.   $TD. T(ink.color). $;
   h.   $TD. T(ink.date). $;
-  if(ink.meter < 20){                                                         // if ..
-    h. $TD. T(ink.meter + "%"). color`red`. backgroundColor`pink`. $;
-  }else{
+  h.   $TD;
+  h.     $BUTTON. type`button`. disabled(ink.meter >= 20). T`Replace`. $;
+  h.   $;
+  if(ink.meter >= 20){                                                        // if ..
     h. $TD. T(ink.meter + "%"). color`green`. $;
+  }else{
+    h. $TD. T(ink.meter + "%"). color`red`. backgroundColor`pink`. $;
   }
   h. $;
 }
@@ -121,7 +124,7 @@ h. $SPAN;
 h.  on.publish(publishSubHTML);
 h.  on.click(appendMessage);
 h. $;
-h. $SPAN. id(id2). data_`count``1`. hidden(true). $;
+h. $SPAN. id(id2). hidden. data_`count``1`. $;
 h.publish();                              // fire 'publish' events after replace nodes
 
 function publishSubHTML(event){
@@ -133,10 +136,10 @@ function showMessage(event){
 }
 
 function appendMessage(event){
-  const count = Number(E(id2).dataset.count);              // E`id`: get element by id
+  const count = Number(E(id2).dataset.count);              // E(id): get element by id
   HTML(id2).
     T`Clicked!`. T(count).
-    $SPAN. id(id2). data_`count`(count + 1). hidden(true). $.
+    $SPAN. id(id2). hidden. data_`count`(count + 1). $.
   publish(true);                              // publish(true): replace target element
 }
 ```
