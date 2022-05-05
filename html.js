@@ -1,4 +1,4 @@
-var LICENSE = 'html.js 1.3.1, ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE';
+var LICENSE = 'html.js 1.3.2, ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE';
 export {HTML, E};
 
 /*** (short) ***/
@@ -13,12 +13,21 @@ const E = (...args) => args[0] && args[0].tagName ? args[0] : document.getElemen
 /*** [HTML Builder] ***/
 const HTML = function(...args){
   if(!(this instanceof HTML)) return new HTML(...args);
-  this._target = E(...args);
-  this._stack = [];
-  this._current = document.createElement("template");
-  this.on = new _On();
-  this.on._owner = this;
-  this._publishEvents = [];
+  const h = (...args) => h._call(...args);
+  delete h.name;
+  delete h.length;
+  Object.setPrototypeOf(h, HTML.prototype);
+  h._target = E(...args);
+  h._stack = [];
+  h._current = document.createElement("template");
+  h.on = new _On();
+  h.on._owner = h;
+  h._publishEvents = [];
+  return _no_call(h);
+};
+const _no_call = (h) => {
+  h._call = () => {};
+  return h;
 };
 /*** tag-begin ***/
 HTML.prototype.defineTag = function(name){
@@ -28,7 +37,7 @@ HTML.prototype.defineTag = function(name){
       _content(this._current).appendChild(newElement);
       this._stack.push(this._current);
       this._current = newElement;
-      return this;
+      return _no_call(this);
     }
   });
 };
@@ -39,17 +48,25 @@ Object.defineProperty(HTML.prototype, "$", {configurable: true, enumerable: true
     if(this._stack[0]){
       this._current = this._stack.pop();
     }
-    return this;
+    return _no_call(this);
   }
 });
 /*** attribute ***/
 HTML.prototype.defineAttribute = function(name){
-  this[_camel(name)] = function(...args){
-    if(args[0] !== false){
-      this._current.setAttribute(name, args[0] === true ? "" : _tagStr(args));
+  Object.defineProperty(this, _camel(name), {configurable: true, enumerable: true,
+    get(){
+      this._current.setAttribute(name, "");
+      this._call = (...args) => {
+        if(args[0] === false){
+          this._current.removeAttribute(name);
+        }else if(args[0] !== true){
+          this._current.setAttribute(name, _tagStr(args));
+        }
+        return _no_call(this);
+      };
+      return this;
     }
-    return this;
-  };
+  });
 };
 "abbr,accept,accept-charset,accesskey,action,align,alink,allow,allowfullscreen,alt,archive,as,async,autocapitalize,autocomplete,autofocus,autoplay,axis,Background,bgcolor,Border,cellpadding,cellspacing,char,charoff,charset,checked,cite,class,classid,Clear,code,codebase,codetype,Color,cols,colspan,compact,content,contenteditable,controls,coords,crossorigin,data,datetime,declare,decoding,default,defer,dir,dirname,disabled,download,draggable,enctype,enterkeyhint,face,for,form,formaction,formenctype,formmethod,formnovalidate,formtarget,frame,frameborder,headers,Height,hidden,high,href,hreflang,hspace,http-equiv,id,imagesizes,imagesrcset,inputmode,integrity,is,ismap,itemid,itemprop,itemref,itemscope,itemtype,kind,label,lang,language,link,list,loading,longdesc,loop,low,marginheight,marginwidth,max,maxlength,media,method,min,minlength,multiple,muted,name,nohref,nomodule,nonce,noresize,noshade,novalidate,nowrap,object,open,optimum,pattern,ping,placeholder,playsinline,poster,preload,profile,prompt,readonly,referrerpolicy,rel,required,rev,reversed,role,rows,rowspan,rules,sandbox,scheme,scope,scrolling,selected,shape,size,sizes,slot,span,spellcheck,src,srcdoc,srclang,srcset,standby,start,step,style,summary,tabindex,target,text,title,translate,type,usemap,valign,value,valuetype,version,vlink,vspace,Width,wrap&activedescendant&atomic&autocomplete&busy&checked&colcount&colindex&colspan&controls&current&describedby&details&disabled&dropeffect&errormessage&expanded&flowto&grabbed&haspopup&hidden&invalid&keyshortcuts&label&labelledby&level&live&modal&multiline&multiselectable&orientation&owns&placeholder&posinset&pressed&readonly&relevant&required&roledescription&rowcount&rowindex&rowspan&selected&setsize&sort&valuemax&valuemin&valuenow&valuetext".replace(/&/g,",aria-").split(",").forEach(name => HTML.prototype.defineAttribute(name));
 /*** data-* ***/
@@ -58,25 +75,25 @@ HTML.prototype.data_ = function(...args){
     const name = _tagStr(args);
     return (...args) => {
       this._current.setAttribute("data-" + name, _tagStr(args));
-      return this;
+      return _no_call(this);
     };
   }else{
     this._current.setAttribute("data-" + args[0], args[1]);
-    return this;
+    return _no_call(this);
   }
 };
 /*** style ***/
 HTML.prototype.defineStyle = function(name){
   this[_camel(name)] = function(...args){
     this._current.style.setProperty(name, _tagStr(args));
-    return this;
+    return _no_call(this);
   };
 };
 "azimuth,background,background-attachment,background-color,background-image,background-position,background-repeat,border,border-bottom,border-bottom-color,border-bottom-style,border-bottom-width,border-collapse,border-color,border-left,border-left-color,border-left-style,border-left-width,border-right,border-right-color,border-right-style,border-right-width,border-spacing,border-style,border-top,border-top-color,border-top-style,border-top-width,border-width,bottom,caption-side,clear,clip,color,Content,counter-increment,counter-reset,cue,cue-after,cue-before,cursor,direction,display,elevation,empty-cells,float,font,font-family,font-size,font-style,font-variant,font-weight,height,left,letter-spacing,line-height,list-style,list-style-image,list-style-position,list-style-type,margin,margin-bottom,margin-left,margin-right,margin-top,max-height,max-width,min-height,min-width,orphans,outline,outline-color,outline-style,outline-width,overflow,padding,padding-bottom,padding-left,padding-right,padding-top,page-break-after,page-break-before,page-break-inside,pause,pause-after,pause-before,pitch,pitch-range,play-during,position,quotes,richness,right,speak,speak-header,speak-numeral,speak-punctuation,speech-rate,stress,table-layout,text-align,text-decoration,text-indent,text-transform,top,unicode-bidi,vertical-align,visibility,voice-family,volume,white-space,widows,width,word-spacing,z-index".split(",").forEach(name => HTML.prototype.defineStyle(name));
 /*** text ***/
 HTML.prototype.T = function(...args){
   _content(this._current).appendChild(document.createTextNode(_tagStr(args)));
-  return this;
+  return _no_call(this);
 };
 /*** html ***/
 HTML.prototype.HTML = function(...args){
@@ -86,7 +103,7 @@ HTML.prototype.HTML = function(...args){
   }
   _content(this._current).appendChild(_root(html).content);
   this._publishEvents.push(...html._publishEvents);
-  return this;
+  return _no_call(this);
 };
 /*** event ***/
 const _On = function(){};
@@ -94,7 +111,7 @@ HTML.prototype.on = _On.prototype;
 HTML.prototype.defineEvent = function(type){
   this.on[type] = function(listener, options){
     this._owner._current.addEventListener(type, listener, options);
-    return this._owner;
+    return _no_call(this._owner);
   };
 };
 "abort,afterprint,afterscriptexecute,animationcancel,animationend,animationiteration,animationstart,appinstalled,auxclick,beforeinput,beforeprint,beforescriptexecute,beforeunload,blur,cancel,canplay,canplaythrough,change,click,close,compositionend,compositionstart,compositionupdate,contextmenu,copy,cuechange,cut,dblclick,devicemotion,deviceorientation,DOMActivate,DOMContentLoaded,DOMMouseScroll,drag,dragend,dragenter,dragleave,dragover,dragstart,drop,durationchange,emptied,ended,enterpictureinpicture,error,focus,focusin,focusout,formdata,fullscreenchange,fullscreenerror,gamepadconnected,gamepaddisconnected,gotpointercapture,hashchange,input,invalid,keydown,keypress,keyup,languagechange,leavepictureinpicture,load,loadeddata,loadedmetadata,loadstart,lostpointercapture,message,messageerror,mousedown,mouseenter,mouseleave,mousemove,mouseout,mouseover,mouseup,mousewheel,offline,online,orientationchange,overflow,pagehide,pageshow,paste,pause,play,playing,pointercancel,pointerdown,pointerenter,pointerleave,pointerlockchange,pointerlockerror,pointermove,pointerout,pointerover,pointerup,popstate,progress,ratechange,readystatechange,rejectionhandled,reset,resize,scroll,search,seeked,seeking,select,selectionchange,selectstart,show,slotchange,stalled,storage,submit,suspend,timeupdate,toggle,touchcancel,touchend,touchmove,touchstart,transitioncancel,transitionend,transitionrun,transitionstart,underflow,unhandledrejection,unload,visibilitychange,volumechange,waiting,webglcontextcreationerror,webglcontextlost,webglcontextrestored,wheel".split(",").forEach(type => HTML.prototype.defineEvent(type));
@@ -103,7 +120,7 @@ HTML.prototype.on.publish = function(listener, options){
     this._owner._current.addEventListener("publish", listener, options);
     this._owner._publishEvents.push(this._owner._current);
   }
-  return this._owner;
+  return _no_call(this._owner);
 };
 /*** publish ***/
 HTML.prototype.publish = function(removeTarget){
@@ -115,11 +132,11 @@ HTML.prototype.publish = function(removeTarget){
   }
   new Set(this._publishEvents).forEach(e => e.dispatchEvent(new Event("publish")));
 };
-/*** to-HTML ***/
+/*** to-html ***/
 HTML.prototype.toString = function(){
   return _root(this).innerHTML;
 };
-/*** to-JS ***/
+/*** to-js ***/
 function _code(sb, node, indent){
   for(const c of _content(node).childNodes){
     if(c.nodeType == 3){
