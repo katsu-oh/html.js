@@ -136,7 +136,7 @@ h. $SPAN;
 h.  on.publish(publishSubHTML);
 h.  on.click(appendMessage);
 h. $;
-h. $SPAN. id(id2). hidden. data_`count``1`. $;
+h. $SPAN. id(id2). data_`count``1`. hidden. $;
 h.publish();                              // fire 'publish' events after replace nodes
 
 function publishSubHTML(event){
@@ -151,7 +151,7 @@ function appendMessage(event){
   const count = Number(E(id2).dataset.count);              // E(id): get element by id
   HTML(id2).
     T`Clicked!`. T(count).
-    $SPAN. id(id2). hidden. data_`count`(count + 1). $.
+    $SPAN. id(id2). data_`count`(count + 1). hidden. $.
   publish(true);                              // publish(true): replace target element
 }
 ```
