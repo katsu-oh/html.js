@@ -14,7 +14,7 @@ body{background-color: #f5f5f5;}
 </style>
 
 <script type="module">
-import {HTML, E} from "https://cdn.jsdelivr.net/gh/katsu-oh/html.js/html.js";
+import {HTML, E} from "https://cdn.jsdelivr.net/gh/katsu-oh/html.js/html.min.js";
 
 // toLocaleString(),  [.] -> [. ],  [</] -> [<\/]
 const html2js = html => HTML().HTML(html).toLocaleString().replace(/(^|`(?:\\.|.)*?`)([^`]*)(?=$|`)/g, (m, p1, p2) => p1 + p2.replace(/\.(?=[^\n])/g, ". ")).replace(/<\//g, "<\\/");
