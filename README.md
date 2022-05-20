@@ -201,7 +201,7 @@ $DIV.id`div-2`.color`red`.
 $.
 ```
 
-See [Wiki](https://github.com/katsu-oh/html.js/wiki) for details.
+See [Wiki](https://github.com/katsu-oh/html.js/wiki) for details.  A converter is [here](https://katsu-oh.github.io/html.js/convert.html).
 
 ## <br>
 ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE.
