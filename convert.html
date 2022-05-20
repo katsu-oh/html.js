@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+<title>HTML to html.js</title>
+
+<style>
+*{margin: 0;}
+textarea{resize: none;}
+body{background-color: #f5f5f5;}
+.js     {color: #444;}
+.js .str{color: #082;}
+.js .tag{color: #930;}
+.js .T  {color: #b08;}
+</style>
+
+<script type="module">
+import {HTML, E} from "https://cdn.jsdelivr.net/gh/katsu-oh/html.js/html.js";
+
+// toLocaleString(),  [.] -> [. ],  [</] -> [<\/]
+const html2js = html => HTML().HTML(html).toLocaleString().replace(/(^|`(?:\\.|.)*?`)([^`]*)(?=$|`)/g, (m, p1, p2) => p1 + p2.replace(/\.(?=[^\n])/g, ". ")).replace(/<\//g, "<\\/");
+
+let newID = 0;
+
+const iHTML = ++newID;
+const iJS = ++newID;
+
+const h = HTML(document.body);
+h. $DIV;
+h.   $TEXTAREA. id(iHTML). placeholder`HTML to convert`. spellcheck`false`. autofocus;
+h.     width`49%`. height`99vh`. verticalAlign`bottom`. whiteSpace`pre`;
+h.     on.input(convert);
+h.   $;
+h.   $PRE;
+h.     width`49%`. height`99vh`. display`inline-block`. verticalAlign`bottom`;
+h.     marginLeft`1%`. marginBottom`4px`. overflow`auto`;
+h.     $CODE. id(iJS). class`js`. $;
+h.   $;
+h. $;
+h.publish();
+
+function convert(event){
+  const html = E(iHTML).value.replace(/^[ \t]*/, "");
+  const js = html2js(html).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const hijs = js.replace(/(^|`(?:\\.|.)*?`)([^`]*)(?=$|`)/g, (m, p1, p2) => "<span class='str'>" + p1 + "</span>" + p2.replace(/(?:^| |\n)\$.*?(?=\.)/g, "<span class='tag'>$&</span>").replace(/(?:^| |\n)T$/g, "<span class='T'>$&</span>"));
+  E(iJS).innerHTML = hijs;
+}
+</script>
