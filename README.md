@@ -1,15 +1,21 @@
 # html.js
 
-This is a simple HTML builder / DOM builder.
+This is a simple HTML builder / DOM builder, which runs on web browsers without any compilation. The following features allow you to write not only readable but also writable code.
+
  - The functions have the same names as tags / attributes / styles / events.
- - The functions with string arguments can also be used as tagged templates.
  - The functions return 'this' for using method chaining.
+ - The functions with no arguments do not require parentheses.
+ - The functions with string arguments can also be used as tagged templates.
+
+It is recommended using dual indentation, one for JavaScript and the other for HTML. Dual indentation makes HTML blocks findable, if/for statements available, and levels of nesting fewer, so that you can write more readable code.
+
+See [Wiki](https://github.com/katsu-oh/html.js/wiki) for details.  A converter is [here](https://katsu-oh.github.io/html.js/convert.html?var=h).
 
 ## Example 1
 ```javascript
 const h = HTML(document.body);                                       // target element
 h. $H1. T`TITLE`. $;
-h. $DIV. id`div-2`. color`red`;
+h. $DIV. id`div-example`. color`red`;
 h.   T`Click! > `;
 h.   $A. class`link`. href`http://www.example.com/`;
 h.     T`Example Company`;
@@ -22,7 +28,7 @@ h.publish();                                         // append nodes to target e
 ```html
 <body>
   <h1>TITLE</h1>
-  <div id="div-2" style="color: red;">
+  <div id="div-example" style="color: red;">
     Click! &gt; 
     <a class="link" href="http://www.example.com/">
       Example Company
@@ -43,21 +49,23 @@ const inks = [
 const h = HTML(document.body);
 h. $H1. T`Inks`. $;
 h. $TABLE;
+h.   $TBODY;
 for(const ink of inks){                                                      // for ..
-  h. $TR;
-  h.   $TD. T(ink.label). $;
-  h.   $TD. T(ink.color). $;
-  h.   $TD. T(ink.date). $;
-  h.   $TD;
-  h.     $BUTTON. type`button`. disabled(ink.meter >= 20). T`Replace`. $;
-  h.   $;
+  h.   $TR;
+  h.     $TD. T(ink.label). $;
+  h.     $TD. T(ink.color). $;
+  h.     $TD. T(ink.date). $;
   if(ink.meter >= 20){                                                        // if ..
-    h. $TD. T(ink.meter + "%"). color`green`. $;
+    h.   $TD. T(ink.meter + "%"). color`green`. $;
   }else{
-    h. $TD. T(ink.meter + "%"). color`red`. backgroundColor`pink`. $;
+    h.   $TD. T(ink.meter + "%"). color`red`. backgroundColor`pink`. $;
   }
-  h. $;
+  h.     $TD;
+  h.       $BUTTON. type`button`. disabled(ink.meter >= 20). T`Replace`. $;
+  h.     $;
+  h.   $;
 }
+h.   $;
 h. $;
 h.publish();
 ```
@@ -67,49 +75,51 @@ h.publish();
 <body>
   <h1>Inks</h1>
   <table>
-    <tr>
-      <td>K</td>
-      <td>Black</td>
-      <td>2020-04-03</td>
-      <td>
-        <button type="button" disabled="">Replace</button>
-      </td>
-      <td style="color: green;">50%</td>
-    </tr>
-    <tr>
-      <td>C</td>
-      <td>Cyan</td>
-      <td>2020-02-15</td>
-      <td>
-        <button type="button" disabled="">Replace</button>
-      </td>
-      <td style="color: green;">30%</td>
-    </tr>
-    <tr>
-      <td>M</td>
-      <td>Megenta</td>
-      <td>2021-04-03</td>
-      <td>
-        <button type="button" disabled="">Replace</button>
-      </td>
-      <td style="color: green;">80%</td>
-    </tr>
-    <tr>
-      <td>Y</td>
-      <td>Yellow</td>
-      <td>2020-01-30</td>
-      <td>
-        <button type="button">Replace</button>
-      </td>
-      <td style="color: red; background-color: pink;">15%</td>
-    </tr>
+    <tbody>
+      <tr>
+        <td>K</td>
+        <td>Black</td>
+        <td>2020-04-03</td>
+        <td style="color: green;">50%</td>
+        <td>
+          <button type="button" disabled="">Replace</button>
+        </td>
+      </tr>
+      <tr>
+        <td>C</td>
+        <td>Cyan</td>
+        <td>2020-02-15</td>
+        <td style="color: green;">30%</td>
+        <td>
+          <button type="button" disabled="">Replace</button>
+        </td>
+      </tr>
+      <tr>
+        <td>M</td>
+        <td>Megenta</td>
+        <td>2021-04-03</td>
+        <td style="color: green;">80%</td>
+        <td>
+          <button type="button" disabled="">Replace</button>
+        </td>
+      </tr>
+      <tr>
+        <td>Y</td>
+        <td>Yellow</td>
+        <td>2020-01-30</td>
+        <td style="color: red; background-color: pink;">15%</td>
+        <td>
+          <button type="button">Replace</button>
+        </td>
+      </tr>
+    </tbody>
   </table>
 </body>
 ```
 
 ## Example 3
 ```javascript
-HTML`div-target`. $SPAN.T`a message`.$. publish();                        // one liner
+HTML`div-target`. $SPAN. T`a message`. $. publish();                      // one liner
 ```
 
 ## Result 3
@@ -128,13 +138,13 @@ const id2 = ++newID;
 
 const h = HTML`div-target`;                                    // id of target element
 h. $SPAN. T`Click here.`;
-h.  on.click(showMessage);
+h.   on.click(showMessage);
 h. $;
 h. $SPAN. id(id1). $;
 h. $BR. $;
 h. $SPAN;
-h.  on.publish(publishSubHTML);
-h.  on.click(appendMessage);
+h.   on.publish(publishSubHTML);
+h.   on.click(appendMessage);
 h. $;
 h. $SPAN. id(id2). data_`count``1`. hidden. $;
 h.publish();                              // fire 'publish' events after replace nodes
@@ -180,7 +190,7 @@ function appendMessage(event){
 ```javascript
 const js = HTML().HTML                                                    // from HTML
  `<h1>TITLE</h1>
-  <div id="div-2" style="color: red;">
+  <div id="div-example" style="color: red;">
     Click! &gt; 
     <a class="link" href="http://www.example.com/">
       Example Company
@@ -193,15 +203,13 @@ alert(js);
 ## Result 5
 ```
 $H1.T`TITLE`.$.
-$DIV.id`div-2`.color`red`.
+$DIV.id`div-example`.color`red`.
   T`Click! > `.
   $A.class`link`.href`http://www.example.com/`.
     T`Example Company`.
   $.
 $.
 ```
-
-See [Wiki](https://github.com/katsu-oh/html.js/wiki) for details.  A converter is [here](https://katsu-oh.github.io/html.js/convert.html).
 
 ## <br>
 ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE.
