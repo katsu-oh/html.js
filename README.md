@@ -1,15 +1,36 @@
 # html.js
 
-This is a simple HTML builder / DOM builder, which runs on web browsers without any compilation. The following features allow you to write not only readable but also writable code.
+This is a simple HTML builder / DOM builder, which runs in a web browser without any compilation. The following features allow you to write not only readable but also writable code.
 
  - The functions have the same names as tags / attributes / styles / events.
  - The functions return 'this' for using method chaining.
  - The functions with no arguments do not require parentheses.
  - The functions with string arguments can also be used as tagged templates.
 
-It is recommended using dual indentation, one for JavaScript and the other for HTML. Dual indentation makes HTML blocks findable, if/for statements available, and levels of nesting fewer, so that you can write more readable code.
+It is recommended to use dual indentation, one for JavaScript and the other for HTML. Dual indentation makes HTML blocks findable, if/for statements available, and levels of nesting fewer, so that you can write more readable code.
 
 See [Wiki](https://github.com/katsu-oh/html.js/wiki) for details.  A converter is [here](https://katsu-oh.github.io/html.js/convert.html?var=h).
+
+## Usage
+1. Write a script element of which 'type' attribute is 'module'.
+1. Import html.js from a CDN.
+1. Write HTML with html.js (cf. Example 1-4).
+
+```html
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>The first HTML</title>
+
+<script type="module">
+import {HTML, E} from "https://cdn.jsdelivr.net/gh/katsu-oh/html.js/html.min.js";
+
+const h = HTML(document.body);
+h. $P;
+h.   T`The first HTML.`;
+h. $;
+h.publish();
+</script>
+```
 
 ## Example 1
 ```javascript
@@ -159,10 +180,10 @@ function showMessage(event){
 
 function appendMessage(event){
   const count = Number(E(id2).dataset.count);              // E(id): get element by id
-  HTML(id2).
-    T`Clicked!`. T(count).
-    $SPAN. id(id2). data_`count`(count + 1). hidden. $.
-  publish(true);                              // publish(true): replace target element
+  const h = HTML(id2);
+  h. T`Clicked!`. T(count);
+  h. $SPAN. id(id2). data_`count`(count + 1). hidden. $;
+  h.publish(true);                            // publish(true): replace target element
 }
 ```
 
