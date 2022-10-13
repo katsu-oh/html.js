@@ -1,4 +1,4 @@
-var LICENSE = 'html.js 1.4.2, ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE';
+var LICENSE = 'html.js 1.5.0, ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE';
 export {HTML, E};
 
 /*** (short) ***/
@@ -8,19 +8,33 @@ const _js = t => t.replace(/[\\`$]/g, m => "\\" + m).replace(/\n/g, "\\n");
 const _camel = n => n.replace(/-[a-z]/g, m => m[1].toUpperCase());
 const _void = () => {};
 
+/*** (check definition) ***/
+const proxify = target => {
+  const p = new Proxy(target, {
+    get(target, name){
+      const r = Reflect.get(target, name, target._proxy);
+      if(r === undefined && typeof name != "symbol" && !(name in target)){
+        throw ReferenceError(name + " is not defined");
+      }
+      return r;
+    }
+  });
+  return p._proxy = p;
+};
+
 /*** [Element Selector] ***/
 const E = (...args) => args[0] && args[0].tagName ? args[0] : document.getElementById(_tagStr(args));
 
 /*** [HTML Builder] ***/
 const HTML = function(...args){
-  const h = (...args) => h._call(...args);
+  const h = proxify((...args) => h._call(...args));
   delete h.name;
   delete h.length;
   Object.setPrototypeOf(h, HTML.prototype);
   h._target = E(...args);
   h._stack = [];
   h._current = document.createElement("template");
-  h.on = new _On;
+  h.on = proxify(new _On);
   h.on._owner = h;
   h._publishEvents = [];
   h._call = _void;
@@ -41,9 +55,10 @@ HTML.prototype.defineTag = function(name){
 /*** tag-end ***/
 Object.defineProperty(HTML.prototype, "$", {configurable: true, enumerable: true,
   get(){
-    if(this._stack[0]){
-      this._current = this._stack.pop();
+    if(!this._stack[0]){
+      throw SyntaxError("$ is unexpected");
     }
+    this._current = this._stack.pop();
     this._call = _void;
     return this;
   }
@@ -103,7 +118,10 @@ HTML.prototype.HTML = function(...args){
   if(!html._publishEvents){
     (html = HTML())._current.innerHTML = _tagStr(args);
   }
-  _content(this._current).appendChild(_root(html).content);
+  if(html._stack[0]){
+    throw SyntaxError("$ is missing");
+  }
+  _content(this._current).appendChild(html._current.content);
   this._publishEvents.push(...html._publishEvents);
   this._call = _void;
   return this;
@@ -129,11 +147,14 @@ HTML.prototype.on.publish = function(listener, options){
 };
 /*** publish ***/
 HTML.prototype.publish = function(removeTarget){
+  if(this._stack[0]){
+    throw SyntaxError("$ is missing");
+  }
   if(removeTarget){
-    this._target.replaceWith(_root(this).content);
+    this._target.replaceWith(this._current.content);
   }else{
     this._target.innerHTML = "";
-    this._target.appendChild(_root(this).content);
+    this._target.appendChild(this._current.content);
   }
   new Set(this._publishEvents).forEach(e => e.dispatchEvent(new Event("publish")));
 };
