@@ -7,12 +7,12 @@ This is a simple HTML builder / DOM builder, which runs in a web browser without
  - The functions with no arguments do not require parentheses.
  - The functions with string arguments can also be used as tagged templates.
 
-It is recommended to use dual indentation, one for JavaScript and the other for HTML. Dual indentation makes HTML blocks findable, if/for statements available, and levels of nesting fewer, so that you can write more readable code (cf. Example 2).
+It is recommended to use dual indentation, one for JavaScript and the other for HTML (cf. Example 2). Each language should have its own indentation. Dual indentation makes HTML blocks findable, if/for statements available, and levels of nesting fewer, so that you can write more readable code.
 
 See [Wiki](https://github.com/katsu-oh/html.js/wiki) for details.  A converter is [here](https://katsu-oh.github.io/html.js/convert.html?var=h).
 
 ## Usage
-1. Write a 'script' element, the 'type' attribute of which is 'module'.
+1. Write a 'script' element the 'type' attribute of which is 'module'.
 1. Import html.js from a CDN.
 1. Write HTML with html.js (cf. Example 1-4).
 
