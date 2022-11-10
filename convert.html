@@ -25,12 +25,12 @@ const iJS = ++newID;
 const h = HTML(document.body);
 h. $DIV;
 h.   $TEXTAREA. id(iHTML). placeholder`HTML to convert`. spellcheck`false`. autofocus;
-h.     width`49%`. height`99vh`. verticalAlign`bottom`. whiteSpace`pre`. resize`none`;
+h.     s.width`49%`. s.height`99vh`. s.verticalAlign`bottom`. s.whiteSpace`pre`. s.resize`none`;
 h.     on.input(convert);
 h.   $;
 h.   $PRE;
-h.     width`49%`. height`99vh`. display`inline-block`. verticalAlign`bottom`;
-h.     marginLeft`1%`. marginBottom`4px`. overflow`auto`;
+h.     s.width`49%`. s.height`99vh`. s.display`inline-block`. s.verticalAlign`bottom`;
+h.     s.marginLeft`1%`. s.marginBottom`4px`. s.overflow`auto`;
 h.     $CODE. id(iJS). class`js`. $;
 h.   $;
 h. $;
@@ -38,7 +38,7 @@ h.publish();
 
 function convert(event){
   let js = HTML().HTML(E(iHTML).value.replace(/^[ \t]*/, "")).toLocaleString().replace(/^ *$/mg, "");
-  js = js.replace(/(^|`(?:\\.|.)*?`)([^`]*)(?=$|`)/g, (m, p1, p2) => p1 + p2.replace(/\.(?=[^\n])/g, ". ")).replace(/<\//g, "<\\/");
+  js = js.replace(/(^|`(?:\\.|.)*?`)([^`]*)(?=$|`)/g, (m, p1, p2) => p1 + p2.replace(/(?<!\Ws)\.(?=[^\n])/g, ". ")).replace(/<\//g, "<\\/");
   if(paramVar){
     js = js.replace(/^(?!$)/mg, paramVar + ". ").replace(/\.$/mg, ";");
   }
