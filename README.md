@@ -1,3 +1,10 @@
+> 2.0.0-<br>
+> Styles and some attributes have changed.
+> <details><summary>details...</summary>
+> <code>HTML.prototype.&lt;styleName&gt;</code> has changed to <code>HTML.prototype.s.&lt;styleName&gt;</code>. Accordingly, the following functions that represent styles have changed to represent attributes.<br><br>
+> <code>HTML.prototype.background</code> <code>HTML.prototype.border</code> <code>HTML.prototype.clear</code> <code>HTML.prototype.color</code> <code>HTML.prototype.height</code> <code>HTML.prototype.width</code>
+> </details>
+
 # html.js
 
 This is a simple HTML builder / DOM builder, which runs in a web browser without any compilation. The following features allow you to write not only readable but also writable code.
@@ -36,7 +43,7 @@ h.publish();
 ```javascript
 const h = HTML(document.body);                                       // target element
 h. $H1. T`TITLE`. $;
-h. $DIV. id`div-example`. color`red`;
+h. $DIV. id`div-example`. s.color`red`;
 h.   T`Click! > `;
 h.   $A. class`link`. href`http://www.example.com/`;
 h.     T`Example Company`;
@@ -71,15 +78,15 @@ const h = HTML(document.body);
 h. $H1. T`Inks`. $;
 h. $TABLE;
 h.   $TBODY;
-for(const ink of inks){                                                      // for ..
+for (const ink of inks) {                                                    // for ..
   h.   $TR;
   h.     $TD. T(ink.label). $;
   h.     $TD. T(ink.color). $;
   h.     $TD. T(ink.date). $;
-  if(ink.meter >= 20){                                                        // if ..
-    h.   $TD. T(ink.meter + "%"). color`green`. $;
-  }else{
-    h.   $TD. T(ink.meter + "%"). color`red`. backgroundColor`pink`. $;
+  if (ink.meter >= 20) {                                                      // if ..
+    h.   $TD. T(ink.meter + "%"). s.color`green`. $;
+  } else {
+    h.   $TD. T(ink.meter + "%"). s.color`red`. s.backgroundColor`pink`. $;
   }
   h.     $TD;
   h.       $BUTTON. type`button`. disabled(ink.meter >= 20). T`Replace`. $;
@@ -170,15 +177,15 @@ h. $;
 h. $SPAN. id(id2). data_`count``1`. hidden. $;
 h.publish();                              // fire 'publish' events after replace nodes
 
-function publishSubHTML(event){
+function publishSubHTML(event) {
   HTML(event.currentTarget). T`Click here, many times.`. publish();
 }
 
-function showMessage(event){
+function showMessage(event) {
   HTML(id1). T`Clicked!`. publish();                 // publish(): replace child nodes
 }
 
-function appendMessage(event){
+function appendMessage(event) {
   const count = Number(E(id2).dataset.count);              // E(id): get element by id
   const h = HTML(id2);
   h. T`Clicked!`. T(count);
@@ -224,7 +231,7 @@ alert(js);
 ## Result 5
 ```
 $H1.T`TITLE`.$.
-$DIV.id`div-example`.color`red`.
+$DIV.id`div-example`.s.color`red`.
   T`Click! > `.
   $A.class`link`.href`http://www.example.com/`.
     T`Example Company`.
