@@ -1,11 +1,11 @@
+# html.js
+
 > 2.0.0-<br>
 > Styles and some attributes have changed.
 > <details><summary>details...</summary>
 > <code>HTML.prototype.&lt;styleName&gt;</code> has changed to <code>HTML.prototype.s.&lt;styleName&gt;</code>. Accordingly, the following functions that represent styles have changed to represent attributes.<br><br>
 > <code>HTML.prototype.background</code> <code>HTML.prototype.border</code> <code>HTML.prototype.clear</code> <code>HTML.prototype.color</code> <code>HTML.prototype.height</code> <code>HTML.prototype.width</code>
 > </details>
-
-# html.js
 
 This is a simple HTML builder / DOM builder, which runs in a web browser without any compilation. The following features allow you to write not only readable but also writable code.
 
