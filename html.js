@@ -1,83 +1,79 @@
-var LICENSE = 'html.js 2.0.0, ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE';
+var LICENSE = 'html.js 2.0.1, ©2022 katsu-oh, MIT License: https://github.com/katsu-oh/html.js/blob/main/LICENSE';
 export {HTML, E};
 
 /*** (short) ***/
 const _content = e => e.tagName == "TEMPLATE" ? e.content : e;
-const _js = t => t.replace(/[\\`$]/g, m => "\\" + m).replace(/\n/g, "\\n");
 const _camel = n => n.replace(/-[a-z]/g, m => m[1].toUpperCase());
-const _void = () => {};
+const _getter = (obj, name, func) => Object.defineProperty(obj, name, {configurable: true, enumerable: true, get: func});
 
 /*** (check definition) ***/
-const _strict = target => {
-  const p = new Proxy(target, {
-    get(target, name){
-      const r = Reflect.get(target, name, target._strict);
-      if(r === undefined && typeof name != "symbol" && !(name in target)){
-        throw ReferenceError(name + " is not defined");
-      }
-      return r;
+const _strict = target => new Proxy(target, {
+  get(target, name, receiver){
+    if(name in target || typeof name == "symbol"){
+      return Reflect.get(target, name, receiver);
     }
-  });
-  return p._strict = p;
-};
+    throw ReferenceError(name + " is not defined");
+  },
+  apply(target, thisArg, args){
+    if(typeof target._call == "function"){
+      return Reflect.apply(target._call, thisArg, args);
+    }
+    throw TypeError(target._call + " is not a function");
+  }
+});
 
 /*** [Element Selector] ***/
 const E = (...args) => args[0] && args[0].tagName ? args[0] : document.getElementById(_tagStr(args));
 
 /*** [HTML Builder] ***/
 const HTML = function(...args){
-  const h = (...args) => h._call(...args);
+  const h = _strict(Object.setPrototypeOf(() => {}, HTML.prototype));
+  h.s = _strict(Object.setPrototypeOf({_owner: h}, h.s));
+  h.on = _strict(Object.setPrototypeOf({_owner: h}, h.on));
   delete h.name;
   delete h.length;
-  Object.setPrototypeOf(h, HTML.prototype);
   h._target = E(...args);
   h._stack = [];
   h._current = document.createElement("template");
-  h.s = _strict(Object.setPrototypeOf({_owner: h}, h.s));
-  h.on = _strict(Object.setPrototypeOf({_owner: h}, h.on));
   h._publishEvents = [];
-  h._call = _void;
-  return _strict(h);
+  h._call = "HTML()";
+  return h;
 };
 /*** tag-begin ***/
 HTML.prototype.defineTag = function(name){
-  Object.defineProperty(this, "$" + name.replace(/-/g, "_"), {configurable: true, enumerable: true,
-    get(){
-      this._stack.push(this._current);
-      this._current = _content(this._current).appendChild(document.createElement(name));
-      this._call = _void;
-      return this;
-    }
+  const js = "$" + name.replace(/-/g, "_");
+  _getter(this, js, function(){
+    this._stack.push(this._current);
+    this._current = _content(this._current).appendChild(document.createElement(name));
+    this._call = js;
+    return this;
   });
 };
 "A,ABBR,ACRONYM,ADDRESS,APPLET,AREA,ARTICLE,ASIDE,AUDIO,B,BASE,BASEFONT,BDI,BDO,BIG,BLOCKQUOTE,BODY,BR,BUTTON,CANVAS,CAPTION,CENTER,CITE,CODE,COL,COLGROUP,COMMAND,DATA,DATALIST,DD,DEL,DETAILS,DFN,DIR,DIV,DL,DT,EM,EMBED,FIELDSET,FIGCAPTION,FIGURE,FONT,FOOTER,FORM,FRAME,FRAMESET,H1,H2,H3,H4,H5,H6,HEAD,HEADER,HGROUP,HR,HTML,I,IFRAME,IMG,INPUT,INS,ISINDEX,KBD,KEYGEN,LABEL,LEGEND,LI,LINK,MAIN,MAP,MARK,MENU,MENUITEM,META,METER,NAV,NOFRAMES,NOSCRIPT,OBJECT,OL,OPTGROUP,OPTION,OUTPUT,P,PARAM,PICTURE,PRE,PROGRESS,Q,RP,RT,RUBY,S,SAMP,SCRIPT,SECTION,SELECT,SLOT,SMALL,SOURCE,SPAN,STRIKE,STRONG,STYLE,SUB,SUMMARY,SUP,TABLE,TBODY,TD,TEMPLATE,TEXTAREA,TFOOT,TH,THEAD,TIME,TITLE,TR,TRACK,TT,U,UL,VAR,VIDEO,WBR".split(",").forEach(name => HTML.prototype.defineTag(name));
 /*** tag-end ***/
-Object.defineProperty(HTML.prototype, "$", {configurable: true, enumerable: true,
-  get(){
-    if(!this._stack[0]){
-      throw SyntaxError("$ is unexpected");
-    }
-    this._current = this._stack.pop();
-    this._call = _void;
-    return this;
+_getter(HTML.prototype, "$", function(){
+  if(!this._stack[0]){
+    throw SyntaxError("$ is unexpected");
   }
+  this._current = this._stack.pop();
+  this._call = "$";
+  return this;
 });
 /*** attribute ***/
 HTML.prototype.defineAttribute = function(name){
-  Object.defineProperty(this, _camel(name), {configurable: true, enumerable: true,
-    get(){
-      this._current.setAttribute(name, "");
-      this._call = (...args) => {
-        if(args[0] === false){
-          this._current.removeAttribute(name);
-        }else if(args[0] !== true){
-          this._current.setAttribute(name, _tagStr(args));
-        }
-        this._call = _void;
-        return this;
-      };
+  const js = _camel(name);
+  _getter(this, js, function(){
+    this._current.setAttribute(name, "");
+    this._call = (...args) => {
+      if(args[0] === false){
+        this._current.removeAttribute(name);
+      }else if(args[0] !== true){
+        this._current.setAttribute(name, _tagStr(args));
+      }
+      this._call = js + "()";
       return this;
-    }
+    };
+    return this;
   });
 };
 "abbr,accept,accept-charset,accesskey,action,align,alink,allow,allowfullscreen,alt,archive,as,async,autocapitalize,autocomplete,autofocus,autoplay,axis,background,bgcolor,border,capture,cellpadding,cellspacing,char,charoff,charset,checked,cite,class,classid,clear,code,codebase,codetype,color,cols,colspan,compact,content,contenteditable,controls,coords,crossorigin,data,datetime,declare,decoding,default,defer,dir,dirname,disabled,download,draggable,enctype,enterkeyhint,face,for,form,formaction,formenctype,formmethod,formnovalidate,formtarget,frame,frameborder,headers,height,hidden,high,href,hreflang,hspace,http-equiv,id,imagesizes,imagesrcset,inputmode,integrity,is,ismap,itemid,itemprop,itemref,itemscope,itemtype,kind,label,lang,language,link,list,loading,longdesc,loop,low,marginheight,marginwidth,max,maxlength,media,method,min,minlength,multiple,muted,name,nohref,nomodule,nonce,noresize,noshade,novalidate,nowrap,object,open,optimum,pattern,ping,placeholder,playsinline,poster,preload,profile,prompt,readonly,referrerpolicy,rel,required,rev,reversed,role,rows,rowspan,rules,sandbox,scheme,scope,scrolling,selected,shape,size,sizes,slot,span,spellcheck,src,srcdoc,srclang,srcset,standby,start,step,style,summary,tabindex,target,text,title,translate,type,usemap,valign,value,valuetype,version,vlink,vspace,width,wrap&activedescendant&atomic&autocomplete&busy&checked&colcount&colindex&colspan&controls&current&describedby&details&disabled&dropeffect&errormessage&expanded&flowto&grabbed&haspopup&hidden&invalid&keyshortcuts&label&labelledby&level&live&modal&multiline&multiselectable&orientation&owns&placeholder&posinset&pressed&readonly&relevant&required&roledescription&rowcount&rowindex&rowspan&selected&setsize&sort&valuemax&valuemin&valuenow&valuetext".replace(/&/g,",aria-").split(",").forEach(name => HTML.prototype.defineAttribute(name));
@@ -87,21 +83,22 @@ HTML.prototype.data_ = function(...args){
     const name = _tagStr(args);
     return (...args) => {
       this._current.setAttribute("data-" + name, _tagStr(args));
-      this._call = _void;
+      this._call = "data_()()";
       return this;
     };
   }else{
     this._current.setAttribute("data-" + args[0], args[1]);
-    this._call = _void;
+    this._call = "data_()";
     return this;
   }
 };
 /*** style ***/
 HTML.prototype.s = {};
 HTML.prototype.defineStyle = function(name){
-  this.s[_camel(name)] = function(...args){
+  const js = _camel(name);
+  this.s[js] = function(...args){
     this._owner._current.style.setProperty(name, _tagStr(args));
-    this._owner._call = _void;
+    this._owner._call = js + "()";
     return this._owner;
   };
 };
@@ -109,7 +106,7 @@ HTML.prototype.defineStyle = function(name){
 /*** text ***/
 HTML.prototype.T = function(...args){
   _content(this._current).append(_tagStr(args));
-  this._call = _void;
+  this._call = "T()";
   return this;
 };
 /*** html ***/
@@ -122,15 +119,16 @@ HTML.prototype.HTML = function(...args){
   }
   _content(this._current).appendChild(html._current.content);
   this._publishEvents.push(...html._publishEvents);
-  this._call = _void;
+  this._call = "HTML()";
   return this;
 };
 /*** event ***/
 HTML.prototype.on = {};
 HTML.prototype.defineEvent = function(type){
-  this.on[_camel(type)] = function(listener, options){
+  const js = _camel(type);
+  this.on[js] = function(listener, options){
     this._owner._current.addEventListener(type, listener, options);
-    this._owner._call = _void;
+    this._owner._call = js + "()";
     return this._owner;
   };
 };
@@ -140,7 +138,7 @@ HTML.prototype.on.publish = function(listener, options){
     this._owner._current.addEventListener("publish", listener, options);
     this._owner._publishEvents.push(this._owner._current);
   }
-  this._owner._call = _void;
+  this._owner._call = "publish()";
   return this._owner;
 };
 /*** publish ***/
@@ -161,6 +159,7 @@ HTML.prototype.toString = function(){
   return this._current.innerHTML;
 };
 /*** to-js ***/
+const _js = t => t.replace(/[\\`$]/g, m => "\\" + m).replace(/\n/g, "\\n");
 function _code(sb, node, indent){
   for(const c of _content(node).childNodes){
     if(c.nodeType == 3){
