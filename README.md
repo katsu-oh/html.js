@@ -1,15 +1,8 @@
 # html.js
 
-> 2.0.0-<br>
-> Styles and some attributes have changed.
-> <details><summary>details...</summary>
-> <code>HTML.prototype.&lt;styleName&gt;</code> has changed to <code>HTML.prototype.s.&lt;styleName&gt;</code>. Accordingly, the following functions that represent styles have changed to represent attributes.<br><br>
-> <code>HTML.prototype.background</code> <code>HTML.prototype.border</code> <code>HTML.prototype.clear</code> <code>HTML.prototype.color</code> <code>HTML.prototype.height</code> <code>HTML.prototype.width</code>
-> </details>
-
 This is a simple HTML builder / DOM builder, which runs in a web browser without any compilation. The following features allow you to write not only readable but also writable code.
 
- - The functions have the same names as tags / attributes / styles / events.
+ - The functions have the same names as tags / attributes / styles / events / character references.
  - The functions return 'this' for using method chaining.
  - The functions with no arguments do not require parentheses.
  - The functions with string arguments can also be used as tagged templates.
@@ -68,10 +61,10 @@ h.publish();                                         // append nodes to target e
 ## Example 2
 ```javascript
 const inks = [
-  { label: "K", color: "Black",   date: "2020-04-03", meter: 50 },
-  { label: "C", color: "Cyan",    date: "2020-02-15", meter: 30 },
-  { label: "M", color: "Megenta", date: "2021-04-03", meter: 80 },
-  { label: "Y", color: "Yellow",  date: "2020-01-30", meter: 15 }
+  { label: "K", color: "Black",   date: "2020-04-03", quantity: 50 },
+  { label: "C", color: "Cyan",    date: "2020-02-15", quantity: 30 },
+  { label: "M", color: "Magenta", date: "2021-04-03", quantity: 80 },
+  { label: "Y", color: "Yellow",  date: "2020-01-30", quantity: 15 }
 ];
 
 const h = HTML(document.body);
@@ -83,13 +76,13 @@ for (const ink of inks) {                                                    // 
   h.     $TD. T(ink.label). $;
   h.     $TD. T(ink.color). $;
   h.     $TD. T(ink.date). $;
-  if (ink.meter >= 20) {                                                      // if ..
-    h.   $TD. T(ink.meter + "%"). s.color`green`. $;
+  if (ink.quantity >= 20) {                                                  // if ..
+    h.   $TD. T(ink.quantity + "ml"). s.color`green`. $;
   } else {
-    h.   $TD. T(ink.meter + "%"). s.color`red`. s.backgroundColor`pink`. $;
+    h.   $TD. T(ink.quantity + "ml"). s.color`red`. s.backgroundColor`pink`. $;
   }
   h.     $TD;
-  h.       $BUTTON. type`button`. disabled(ink.meter >= 20). T`Replace`. $;
+  h.       $BUTTON. type`button`. disabled(ink.quantity >= 20). T`Replace`. $;
   h.     $;
   h.   $;
 }
@@ -108,7 +101,7 @@ h.publish();
         <td>K</td>
         <td>Black</td>
         <td>2020-04-03</td>
-        <td style="color: green;">50%</td>
+        <td style="color: green;">50ml</td>
         <td>
           <button type="button" disabled="">Replace</button>
         </td>
@@ -117,16 +110,16 @@ h.publish();
         <td>C</td>
         <td>Cyan</td>
         <td>2020-02-15</td>
-        <td style="color: green;">30%</td>
+        <td style="color: green;">30ml</td>
         <td>
           <button type="button" disabled="">Replace</button>
         </td>
       </tr>
       <tr>
         <td>M</td>
-        <td>Megenta</td>
+        <td>Magenta</td>
         <td>2021-04-03</td>
-        <td style="color: green;">80%</td>
+        <td style="color: green;">80ml</td>
         <td>
           <button type="button" disabled="">Replace</button>
         </td>
@@ -135,7 +128,7 @@ h.publish();
         <td>Y</td>
         <td>Yellow</td>
         <td>2020-01-30</td>
-        <td style="color: red; background-color: pink;">15%</td>
+        <td style="color: red; background-color: pink;">15ml</td>
         <td>
           <button type="button">Replace</button>
         </td>
@@ -147,13 +140,13 @@ h.publish();
 
 ## Example 3
 ```javascript
-HTML`div-target`. $SPAN. T`a message`. $. publish();                      // one liner
+HTML`div-target`. $SPAN. T.copy. T`2022 Example Company`. $. publish();   // one liner
 ```
 
 ## Result 3
 ```html
 <... id="div-target">
-  <span>a message</span>
+  <span>&copy;2022 Example Company</span>
 </...>
 ```
 
