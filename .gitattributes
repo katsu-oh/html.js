@@ -1,2 +1,2 @@
-html.js linguist-language=JavaScript
-convert.html linguist-language=HTML
+* linguist-vendored
+*.js linguist-vendored=false
