@@ -1,2 +1,2 @@
 *.html linguist-documentation
-html.js linguist-language=JavaScript
+*.html linguist-language=JavaScript
